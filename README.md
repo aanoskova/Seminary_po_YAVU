@@ -1,0 +1,1 @@
+# Seminary_po_YAVU

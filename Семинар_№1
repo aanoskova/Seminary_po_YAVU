@@ -1,0 +1,54 @@
+#include <iostream>
+#include <iomanip>
+#include <windows.h>
+#include <cmath>
+
+using namespace std;
+
+double calcF(double x) {
+	return pow(x, 4) + 39 * pow(x, 3) + 958 * pow(x, 2) - 1081;
+}
+void tabulateF(double a, double b, double h, double& sumPositive, int& otrits) {
+	int n = static_cast<int>(round((b - a) / h)) + 1;
+
+	sumPositive = 0.0;
+	otrits = 0;
+
+	cout << setw(10) << "x" << setw(15) << "f(x)" << endl;
+
+	cout << "----------------------------" << endl;
+	for (int i = 0; i < n; ++i) {
+		double x = a + i * h;
+		double y = calcF(x);
+
+		if (y > 0) {
+			sumPositive += y;
+		}
+		else if (y < 0) {
+			otrits++;
+		}
+
+		cout << setw(10) << fixed << setprecision(3) << x << setw(15) << fixed << setprecision(6) << y << endl;
+	}
+}
+int main() 
+	{
+		setlocale(LC_ALL, "Russian");
+		double a, b, h, sumPositive;
+		int otrits;
+
+		cout << "Введите начальное значение x(a): ";
+		cin >> a;
+		cout << "Введите конечное значение x(b): ";
+		cin >> b;
+		cout << "Шаг h: ";
+		cin >> h;
+		cout << endl;
+
+		tabulateF(a, b, h, sumPositive, otrits);
+		cout << "\nРезультаты: " << endl;
+		cout << "Сумма положительных значений: " << sumPositive << endl;
+		cout << "Количество отрицательных значений: " << otrits << endl;
+
+		return 0;
+	}

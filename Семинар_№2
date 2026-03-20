@@ -1,0 +1,119 @@
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <clocale>
+#include <string>
+
+using namespace std;
+
+double seriesFunc(double x, double eps, int& terms, double& lastTerm)
+{
+    double term = x;        
+    double sum = term;
+    int n = 0;              
+    terms = 1;
+    lastTerm = term;
+
+    while (fabs(term) > eps)
+    {
+        term *= -x * (n + 1) / (n + 2);
+        sum += term;
+        n++;
+        terms++;
+        lastTerm = term;
+    }
+    return sum;
+}
+
+double stdFunc(double x)
+{
+    return log(1 + x);
+}
+
+void tabulate(double a, double b, double h, double eps,
+    double (*stdFunc)(double),
+    double (*seriesFunc)(double, double, int&, double&),
+    const string& funcName)
+{
+    int nSteps = static_cast<int>((b - a) / h + 0.5) + 1;
+
+    cout << "\n--- Табулирование " << funcName << "(x) = ln(1+x) ---" << endl;
+    cout << setw(8) << "x"
+        << setw(18) << funcName + "(x) std"
+        << setw(18) << funcName + "(x) ряд"
+        << setw(18) << "погрешность"
+        << setw(10) << "членов"
+        << setw(18) << "посл. член"
+        << endl;
+    cout << string(90, '-') << endl;
+
+    for (int i = 0; i < nSteps; ++i)
+    {
+        double x = a + i * h;
+
+        if (fabs(x) >= 1)
+        {
+            cout << setw(8) << fixed << setprecision(3) << x
+                << "   Ряд расходится при |x| >= 1" << endl;
+            continue;
+        }
+
+        int terms;
+        double lastTerm;
+
+        double y_std = stdFunc(x);
+        double y_ser = seriesFunc(x, eps, terms, lastTerm);
+        double error = fabs(y_std - y_ser);
+
+        cout << setw(8) << fixed << setprecision(3) << x
+            << setw(18) << fixed << setprecision(8) << y_std
+            << setw(18) << fixed << setprecision(8) << y_ser
+            << setw(18) << scientific << setprecision(2) << error
+            << setw(10) << fixed << terms
+            << setw(18) << scientific << setprecision(2)
+            << fabs(lastTerm)
+            << endl;
+    }
+}
+
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+
+    double a, b, h, eps;
+    int choice;
+
+    cout << "Введите параметры табулирования для ln(1+x):" << endl;
+    cout << "Начало интервала a = ";
+    cin >> a;
+    cout << "Конец интервала b = ";
+    cin >> b;
+    cout << "Шаг h = ";
+    cin >> h;
+    cout << "Точность epsilon = ";
+    cin >> eps;
+
+    do
+    {
+        cout << "\nВыберите действие:\n";
+        cout << "1 - Табулировать f(x) = ln(1+x)\n";
+        cout << "0 - выход\n";
+        cout << "Ваш выбор: ";
+        cin >> choice;
+        cout << endl;
+
+        switch (choice)
+        {
+        case 1:
+            tabulate(a, b, h, eps, stdFunc, seriesFunc, "f");
+            break;
+        case 0:
+            cout << "Завершение работы программы.\n";
+            break;
+        default:
+            cout << "Ошибка выбора. Повторите ввод.\n";
+        }
+    } while (choice != 0);
+
+    return 0;
+}
